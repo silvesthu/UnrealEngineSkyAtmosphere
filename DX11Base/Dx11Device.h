@@ -7,7 +7,6 @@
 #define DX_DEBUG_RESOURCE_NAME 1
 
 // Windows and Dx11 includes
-#include <string>
 #include <map>
 #include <string>
 #include <vector>
