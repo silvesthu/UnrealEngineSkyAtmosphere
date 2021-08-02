@@ -566,6 +566,10 @@ float4 RenderTransmittanceLutPS(VertexOutput Input) : SV_TARGET
 	const bool MieRayPhase = false;
 	float3 transmittance = exp(-IntegrateScatteredLuminance(pixPos, WorldPos, WorldDir, sun_direction, Atmosphere, ground, SampleCountIni, DepthBufferValue, VariableSampleCount, MieRayPhase).OpticalDepth);
 
+	// Debug
+	// return float4(WorldDir, 1);
+	// return float4(viewZenithCosAngle, viewHeight, 0, 1);
+
 	// Opetical depth to transmittance
 	return float4(transmittance, 1.0f);
 }

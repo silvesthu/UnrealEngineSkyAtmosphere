@@ -358,6 +358,7 @@ private:
 	bool mPrintDebug = false;
 	bool mClearDebugState = true;
 	bool mUpdateDebugState = true;
+	bool mDumpTextures = false;
 	GpuDebugState mDebugState;
 	GpuDebugState mDummyDebugState;
 

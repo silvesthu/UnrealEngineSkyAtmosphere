@@ -12,6 +12,7 @@
 #define TINYEXR_IMPLEMENTATION
 #include <tinyexr/tinyexr.h>
 
+#include <DirectXTex/DirectXTex/DirectXTex.h>
 
 Game::Game()
 {
@@ -415,6 +416,9 @@ void Game::allocateResolutionIndependentResources()
 		AtmosphereCameraScatteringVolume = new Texture3D(desc);
 		desc.Format = DXGI_FORMAT_R11G11B10_FLOAT;
 		AtmosphereCameraTransmittanceVolume = new Texture3D(desc);
+
+		DX_SET_DEBUG_NAME(AtmosphereCameraScatteringVolume->mTexture, "AtmosphereCameraScatteringVolume");
+		DX_SET_DEBUG_NAME(AtmosphereCameraTransmittanceVolume->mTexture, "AtmosphereCameraTransmittanceVolume");
 	}
 
 	mBlueNoise2dTex = createTexture2dFromExr("./Resources/bluenoise.exr");		// I do not remember where this noise texture comes from.
@@ -422,6 +426,8 @@ void Game::allocateResolutionIndependentResources()
 
 	D3dTexture2dDesc desc = Texture2D::initDefault(DXGI_FORMAT_R16G16B16A16_FLOAT, LutsInfo.TRANSMITTANCE_TEXTURE_WIDTH, LutsInfo.TRANSMITTANCE_TEXTURE_HEIGHT, true, true);
 	mTransmittanceTex = new Texture2D(desc);
+
+	DX_SET_DEBUG_NAME(mTransmittanceTex->mTexture, "mTransmittanceTex");
 
 	{
 		D3dTexture2dDesc descIllum = desc;
@@ -432,6 +438,9 @@ void Game::allocateResolutionIndependentResources()
 		descIllum.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		MultiScattTex = new Texture2D(descIllum);
 		MultiScattStep0Tex = new Texture2D(descIllum);
+
+		DX_SET_DEBUG_NAME(MultiScattTex->mTexture, "MultiScattTex");
+		DX_SET_DEBUG_NAME(MultiScattStep0Tex->mTexture, "MultiScattStep0Tex");
 	}
 
 	{
@@ -440,6 +449,8 @@ void Game::allocateResolutionIndependentResources()
 		descSkyView.Height = 108;
 		descSkyView.Format = DXGI_FORMAT_R11G11B10_FLOAT;
 		mSkyViewLutTex = new Texture2D(descSkyView);
+
+		DX_SET_DEBUG_NAME(mSkyViewLutTex->mTexture, "mSkyViewLutTex");
 	}
 }
 
@@ -791,6 +802,7 @@ void Game::render()
 		ImGui::Checkbox("ClearDebug", &mClearDebugState);
 		ImGui::Checkbox("UpdateDebug", &mUpdateDebugState);
 		ImGui::Checkbox("PrintDebug", &mPrintDebug);
+		ImGui::Checkbox("DumpTextures", &mDumpTextures);
 		ImGui::Separator();
 
 		ImGui::Text("View");
@@ -1065,6 +1077,23 @@ void Game::render()
 		gpuDebugStateDraw(mDebugState, mViewProjMat);
 		context->OMSetBlendState(mDefaultBlendState->mState, nullptr, 0xffffffff);
 		context->OMSetDepthStencilState(mDefaultDepthStencilState->mState, 0);
+	}
+
+	if (mDumpTextures)
+	{
+		::CreateDirectoryW(L"TextureDump/", nullptr);
+
+		DirectX::ScratchImage image;
+		DirectX::CaptureTexture(g_dx11Device->getDevice(), context, mTransmittanceTex->mTexture, image);
+		DirectX::SaveToDDSFile(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::DDS_FLAGS_NONE, L"TextureDump/TransmittanceTex.dds");
+		DirectX::CaptureTexture(g_dx11Device->getDevice(), context, MultiScattTex->mTexture, image);
+		DirectX::SaveToDDSFile(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::DDS_FLAGS_NONE, L"TextureDump/MultiScattTex.dds");
+		DirectX::CaptureTexture(g_dx11Device->getDevice(), context, mSkyViewLutTex->mTexture, image);
+		DirectX::SaveToDDSFile(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::DDS_FLAGS_NONE, L"TextureDump/SkyViewLutTex.dds");
+		DirectX::CaptureTexture(g_dx11Device->getDevice(), context, AtmosphereCameraScatteringVolume->mTexture, image);
+		DirectX::SaveToDDSFile(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::DDS_FLAGS_NONE, L"TextureDump/AtmosphereCameraScatteringVolume.dds");
+
+		mDumpTextures = false;
 	}
 
 	if (takeScreenShot)

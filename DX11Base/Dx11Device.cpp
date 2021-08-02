@@ -802,7 +802,7 @@ static ID3D10Blob* compileShader(const TCHAR* filename, const char* entryFunctio
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,	// default include handler (includes relative to the compiled file)
 		entryFunction,						// function name
 		profile,							// target profile
-		defaultFlags,//D3DCOMPILE_DEBUG,	// flag1
+		D3DCOMPILE_DEBUG, // defaultFlags,//D3DCOMPILE_DEBUG,	// flag1
 		defaultFlags,						// flag2
 		&shaderBuffer,						// ouput
 		&errorbuffer);						// errors
