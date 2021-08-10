@@ -637,6 +637,15 @@ float4 SkyViewLutPS(VertexOutput Input) : SV_TARGET
 
 	float3 L = ss.L;
 
+	// Debug
+	// return float4(pixPos, 0, 1);
+	// return float4(WorldPos, 1);
+	// return float4(WorldDir, 1);
+	// return float4(viewZenithSinAngle, viewZenithCosAngle, 0, 1);
+	// return float4(uv, viewHeight, 1);
+	// return float4(SunDir, 1);
+	// return MultiScatTexture.SampleLevel(samplerLinearClamp, uv, 0);
+
 	return float4(L, 1);
 }
 
@@ -661,6 +670,9 @@ float4 RenderCameraVolumePS(GeometryOutput Input) : SV_TARGET0
 	float3 camPos = camera + float3(0, 0, earthR);
 	float3 SunDir = sun_direction;
 	float3 SunLuminance = 0.0;
+
+	// Debug
+	float3 WorldDir_Raw = WorldDir;
 
 	float Slice = ((float(Input.sliceId) + 0.5f) / AP_SLICE_COUNT);
 	Slice *= Slice;	// squared distribution
@@ -715,6 +727,15 @@ float4 RenderCameraVolumePS(GeometryOutput Input) : SV_TARGET0
 	const bool MieRayPhase = true;
 	SingleScatteringResult ss = IntegrateScatteredLuminance(pixPos, WorldPos, WorldDir, SunDir, Atmosphere, ground, SampleCountIni, DepthBufferValue, VariableSampleCount, MieRayPhase, tMaxMax);
 
+	// Debug
+	//return float4(pixPos, 0.0, 1.0);
+	//return float4(camera, 1.0);
+	//return float4(SunDir, 1.0);
+	//return float4(SampleCountIni.xxx, 1.0);
+	//return float4(WorldDir_Raw, 1.0);
+	//return float4(tMaxMax.xxx, 1.0);
+	//return float4(newWorldPos, 1.0);
+	//return float4(WorldDir, 1.0);
 
 	const float Transmittance = dot(ss.Transmittance, float3(1.0f / 3.0f, 1.0f / 3.0f, 1.0f / 3.0f));
 	return float4(ss.L, 1.0 - Transmittance);

@@ -335,8 +335,6 @@ imgui\.ini
 
 screenshot\.exr
 
-TextureDump/
-
 # Ignore folders with reference captures
 _*/
 z*/
